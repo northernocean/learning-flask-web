@@ -18,3 +18,8 @@ def thank_you():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
+
+if __name__ == "__main__":
+    # Alternate launch configuration for catching errors with VSCode debugger
+    # https://blog.miguelgrinberg.com/post/setting-up-a-flask-application-in-visual-studio-code 
+    app.run(use_debugger=False, use_reloader=False, passthrough_errors=True)
