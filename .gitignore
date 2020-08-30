@@ -1,5 +1,6 @@
 # User Defined
 .vscode/
+data.sqlite
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
