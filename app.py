@@ -24,7 +24,8 @@ class Puppy(db.Model):
         self.name = name
         self.age = age
 
+    def __str__(self):
+        return f"{self.id}/{self.name},{self.age}"
+    
     def __repr__(self):
-        return f"Puppy {self.name} is {self.age} year/s old"
-
-
+        return f'{{"id":"{self.id}", "name":"{self.name}", "age":"{self.age}"}}'
