@@ -1,23 +1,22 @@
 import os
-from app import db
-from app import Puppy
+from app import db, Puppy, Owner, Toy
 
-os.remove("data.sqlite")
+rufus = Puppy("Rufus", 3, "Lab")
+fido = Puppy("Fido", 2, "Poodle")
 
-# can be done with command line tools (i.e. migrate db)
-db.create_all()
-
-sam = Puppy("Sammy", 3)
-frank = Puppy("Frankie", 4)
-
-print(sam)
-print(frank)
-
-db.session.add_all([frank, sam])
-
+db.session.add_all([rufus,fido])
 db.session.commit()
 
-print(frank)
-print(sam)
+print(Puppy.query.all())
 
+jose = Owner("Jose",rufus.id)
+toy1 = Toy('Chew Toy',rufus.id)
+toy2 = Toy("Ball",rufus.id)
 
+db.session.add_all([jose,toy1,toy2])
+db.session.commit()
+
+rufus = Puppy.query.filter_by(name='Rufus').first()
+print(repr(rufus))
+
+print(rufus.report_toys())
