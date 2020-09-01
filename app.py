@@ -22,13 +22,14 @@ class Puppy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     age = db.Column(db.Integer)
+    breed = db.Column(db.Text)
 
     def __init__(self, name, age):
         self.name = name
         self.age = age
 
     def __str__(self):
-        return f"{self.id}/{self.name},{self.age}"
+        return f"{self.id}/{self.name},{self.age},{self.breed}"
     
     def __repr__(self):
-        return f'{{"id":"{self.id}", "name":"{self.name}", "age":"{self.age}"}}'
+        return f'{{"id":"{self.id}", "name":"{self.name}", "age":"{self.age}", "breed":"{self.breed}"}}'
