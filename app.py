@@ -22,9 +22,12 @@ class Puppy(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
 
-    def init(self, name: str):
+    def __init__(self, name):
         self.name = name
     
+    def __str__(self):
+        return f"{self.name} (id: {str(self.id)})"
+
     def __repr__(self):
         return f'{{"name":"{self.name}"}}'
 
@@ -41,6 +44,7 @@ def add_pup():
     
     if form.validate_on_submit():
         name = form.name.data
+        print(name)
         newpuppy = Puppy(name)
         db.session.add(newpuppy)
         db.session.commit()
