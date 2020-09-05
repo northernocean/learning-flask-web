@@ -9,7 +9,7 @@ puppies_blueprint = Blueprint("puppies", __name__,
 
 
 @puppies_blueprint.route("/add", methods=["GET","POST"])
-def add_pup():
+def add():
     
     form = AddForm()
     
@@ -24,7 +24,7 @@ def add_pup():
     return render_template("add.html", form=form)
 
 
-@puppies_blueprint.route("/add")  # no form on this page so don't require methods...
+@puppies_blueprint.route("/list")  # no form on this page so don't require methods...
 def list():
 
     puppies = Puppy.query.all()
