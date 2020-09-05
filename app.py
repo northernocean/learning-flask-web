@@ -2,7 +2,7 @@ from project import app
 from flask import render_template
 
 @app.route("/")
-def index:
+def index():
     return render_template("home.html")
 
 if __name__ == "__main__":
