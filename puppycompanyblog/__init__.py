@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from puppycompanyblog.core.views import core
 from puppycompanyblog.error_pages.handlers import error_pages
+from puppycompanyblog.users.views import users
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -21,4 +22,5 @@ login_manager.init_app(app)
 login_manager.login_view = "users.login"
 
 app.register_blueprint(core)
+app.register_blueprint(users)
 app.register_blueprint(error_pages)
