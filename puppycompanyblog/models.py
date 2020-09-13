@@ -33,7 +33,7 @@ class User(db.Model, UserMixin):
         return f"{self.username}"
 
 
-class BlogPost():
+class BlogPost(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

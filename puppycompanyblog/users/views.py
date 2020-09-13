@@ -7,8 +7,26 @@ from puppycompanyblog.users.picture_handler import add_profile_image
 
 users = Blueprint("users", __name__)
 
-# account
-# list of posts
+@users.route("/register", methods=["GET", "POST"])
+def register():
+
+    form = RegistrationForm()
+
+    if form.validate_on_submit():
+
+        user = User(
+            email=form.email.data,
+            username=form.username.data,
+            password=form.password.data)
+
+        db.session.add(user)
+        db.session.commit()
+
+        flash("Thanks for registering.")
+
+        return redirect(url_for("users.login"))
+
+    return render_template("register.html", form=form)
 
 
 @users.route("/account", methods=["GET", "POST"])
@@ -17,24 +35,29 @@ def account():
 
     form = UpdateUserForm()
 
-    if form.validate_on_submit():
+    if form.is_submitted():
+        
+        if form.validate():
 
-        if form.image.data:
-            username = current_user.username
-            new_image_path = add_profile_image(form.image.data, username)
-            current_user.profile_image = new_image_path
+            if form.profile_image.data:
+                username = current_user.username
+                new_image_path = add_profile_image(form.profile_image.data, username)
+                current_user.profile_image = new_image_path
+            
+            current_user.username = form.username.data
+            current_user.email = form.email.data
 
-        current_user.username = form.username.data
-        current_user.email = form.email.data
+            db.session.commit()
 
-        db.session.commit()
-
-        flash("User Account Updated.")
-        return redirect(url_for("core.index"))
-
-    elif request.method == "GET":
-        form.username.data = current_user.username
-        form.email.data = current_user.email
+            flash("User Account Updated.")
+            return redirect(url_for("core.index"))
+        
+        else:
+            print(form.errors)
+            return redirect(url_for("core.index"))
+    
+    form.username.data = current_user.username
+    form.email.data = current_user.email
 
     profile_image = url_for("static", filename="profile_images/" + current_user.profile_image)
     return render_template("account.html", profile_image=profile_image, form=form)
@@ -56,28 +79,6 @@ def user_posts(username):
 def logout():
     logout_user()
     return redirect(url_for("core.index"))
-
-
-@users.route("/register", methods=["GET", "POST"])
-def register():
-
-    form = RegistrationForm()
-
-    if form.validate_on_submit():
-
-        user = User(
-            email=form.email.data,
-            username=form.username.data,
-            password=form.data.password)
-
-        db.session.add(user)
-        db.session.commit()
-
-        flash("Thanks for registering.")
-
-        return redirect(url_for("users.login"))
-
-    return render_template("register.html", form=form)
 
 
 @users.route("/login", methods=["GET", "POST"])
