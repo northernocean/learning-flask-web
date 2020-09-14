@@ -1,72 +1,40 @@
-import os
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_restful import Api, Resource
-from users import authenticate, identity
-from flask_jwt import JWT, jwt_required
-from flask_migrate import Migrate
+from flask import Flask, render_template, request, redirect, url_for
+import stripe
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'mysecretkey'
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+public_key = 'pk_test_6pRNASCoBOKtIshFeQd4XMUh'
 
-db = SQLAlchemy(app)
-Migrate(app, db)
-jwt = JWT(app, authenticate, identity)
-api = Api(app)
+stripe.api_key = "sk_test_BQokikJOvBiI2HlWgH4olfQ2"
 
 
-class Puppy(db.Model):
-
-    name = db.Column(db.String(80), primary_key=True)
-
-    def __init__(self, name):
-        self.name = name
-
-    def json(self):
-        return {"name": self.name}
-
-    def __str__(self):
-        return f"{self.name}"
+@app.route('/')
+def index():
+    return render_template('index.html', public_key=public_key)
 
 
-class PuppyResource(Resource):
-
-    def get(self, name):
-        pup = Puppy.query.filter_by(name=name).first()
-        if pup:
-            return pup.json()
-        return {}, 404
-
-    @jwt_required()
-    def post(self, name):
-        pup = Puppy(name=name)
-        db.session.add(pup)
-        db.session.commit()
-        return pup.json()
-
-    def delete(self, name):
-        pup = Puppy.query.filter_by(name=name).first()
-        if pup:
-            db.session.delete(pup)
-            db.session.commit()
-            return {}, 400
-        return {}, 404
+@app.route('/thankyou')
+def thankyou():
+    return render_template('thankyou.html')
 
 
-class AllPuppies(Resource):
+@app.route('/payment', methods=['POST'])
+def payment():
 
-    @jwt_required()
-    def get(self):
-        puppies = Puppy.query.all()
-        return [pup.json() for pup in puppies]
+    # CUSTOMER INFORMATION
+    customer = stripe.Customer.create(email=request.form['stripeEmail'],
+                                      source=request.form['stripeToken'])
 
+    # CHARGE/PAYMENT INFORMATION
+    stripe.Charge.create(
+        customer=customer.id,
+        amount=1999,
+        currency='usd',
+        description='Donation'
+    )
 
-api.add_resource(PuppyResource, '/puppy/<string:name>')
-api.add_resource(AllPuppies, '/puppies')
+    return redirect(url_for('thankyou'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
